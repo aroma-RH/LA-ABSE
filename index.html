@@ -1,250 +1,190 @@
 <!DOCTYPE html>
 <html>
-  
-  <head>
+<head>
+  <base target="_top">
+  <style>
+   
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    h3 {
+      background-color: #4a90e2;
+      color: #fff;
+      text-align: center;
+      padding: 10px;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    table {
+      width: 100%;
+      max-width: 800px;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #4a90e2;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tr:hover {
+      background-color: #eaf3fc;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border: 1px solid #4a90e2;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: #357ab8;
+    }
+
     
-    <base target="_top">
-    <style>
-      /* General body and table styles */
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f9f9f9;
-        color: #333;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        padding: 20px;
+    #filterButton {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    #filterButton:hover {
+      background-color: #357ab8;
+    }
+    #goToforme {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    #goToforme:hover {
+      background-color: #357ab8;
+    }
+  </style>
+</head>
+<body>
+
+  <h3>LA BASE (CAMPO)</h3>
+  <div style="text-align: center; margin-top: 10px;">
+    <button id="goToforme" onclick="goToforme()">Retour</button>
+    <button id="filterButton" onclick="filterTable()">Recherch</button>
+  </div>
+  <table id="dataTable">
+    <thead>
+
+      <tr>
+        <th><input type="text" id="filter1" placeholder="Filtre..."></th>
+        <th><input type="text" id="filter2" placeholder="Filtre..."></th>
+        <th><input type="text" id="filter3" placeholder="Filtre..."></th>
+        <th><input type="text" id="filter4" placeholder="Filtre..." disabled></th>
+        <th><input type="text" id="filter5" placeholder="Filtre..."></th>
+      </tr>
+      <tr>
+        <th>CODIGO</th>
+        <th>NOMBRE</th>
+        <th>NIF</th>
+        <th>CONTRATO</th>
+        <th>ENCARGADO</th>
+      </tr>
+    </thead>
+    <tbody id="tableData"></tbody>
+  </table>
+
+  
+
+  <script>
+    function goToforme() {
+    window.location.href = "https://aroma-rh.github.io/EFFECTIF/";
+  }
+    let data = [];  
+    function loadData() {
+      fetch('https://script.google.com/macros/s/AKfycbyQn5_QevlEOIt31TZrCgVsiWGHoLBZUHRPs1pFgLx4Qqm0nthi51w4SJ5QhAfQhGc/exec')
+        .then(response => response.json())
+        .then(jsonData => {
+          data = jsonData;  
+        })
+        .catch(error => {
+          console.error('Error loading data:', error);
+          alert('Error loading data');
+        });
+    }
+
+    function renderTable(displayData) {
+      const tableData = document.getElementById('tableData');
+      tableData.innerHTML = displayData.map(row => 
+        `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`
+      ).join('');
+    }
+
+    function filterTable() {
+      const filters = [
+        document.getElementById("filter1").value.toLowerCase(),
+        document.getElementById("filter2").value.toLowerCase(),
+        document.getElementById("filter3").value.toLowerCase(),
+        "", 
+        document.getElementById("filter5").value.toLowerCase()
+      ];
+
+      const allFiltersEmpty = filters.every((filter, i) => i === 3 || filter === "");
+
+      if (allFiltersEmpty) {
+        document.getElementById('tableData').innerHTML = ''; 
+        return;
       }
 
-      h3 {
-        background-color: #4a90e2;
-        color: #fff;
-        text-align: center;
-        padding: 10px;
-        border-radius: 4px;
-        width: 100%;
-        max-width: 800px;
-      }
+      const filteredData = data.filter(row =>
+        filters.every((filter, i) => {
+          if (!filter || i === 3) return true;  
 
-      table {
-        width: 100%;
-        max-width: 800px;
-        border-collapse: collapse;
-        margin: 20px 0;
-      }
+          const cellValue = row[i] ? row[i].toString().toLowerCase() : '';
 
-      th, td {
-        border: 1px solid #ddd;
-        padding: 12px;
-        text-align: center;
-      }
+          
+          if (i === 4) {
+            const regex = new RegExp(filter, 'i'); 
+            return regex.test(cellValue); 
+          }
 
-      th {
-        background-color: #4a90e2;
-        color: #fff;
-      }
+          return cellValue.includes(filter);
+        })
+      );
 
-      tr:nth-child(even) {
-        background-color: #f2f2f2;
-      }
+      renderTable(filteredData); 
+    }
 
-      tr:hover {
-        background-color: #eaf3fc;
-      }
-
-      input[type="text"] {
-        width: 100%;
-        padding: 8px;
-        box-sizing: border-box;
-        border: 1px solid #4a90e2;
-        border-radius: 4px;
-        outline: none;
-      }
-
-      input[type="text"]:focus {
-        border-color: #357ab8;
-      }
-
-      /* Dropdown menu styles */
-      .dropdown {
-        position: relative;
-        display: inline-block;
-        margin-bottom: 10px;
-        margin-top: 30px;
-        height: 40px;
-        width: 100%;
-      }
-
-      .dropbtn {
-        background-color: #4a90e2;
-        color: white;
-        padding: 10px 20px;
-        font-size: 16px;
-        border: none;
-        cursor: pointer;
-        border-radius: 4px;
-        height: 30px;
-        width: 100%;
-      }
-
-      .dropbtn:hover {
-        background-color: #357ab8;
-      }
-
-      .dropdown-content {
-        display: none;
-        position: absolute;
-        background-color: #f1f1f1;
-        min-width: 160px;
-        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-        z-index: 1;
-      }
-
-      .dropdown-content a {
-        color: black;
-        padding: 12px 16px;
-        text-decoration: none;
-        display: block;
-      }
-
-      .dropdown-content a:hover {
-        background-color: #ddd;
-      }
-
-      .dropdown:hover .dropdown-content {
-        display: block;
-      }
-
-      /* Nested dropdown menu */
-      .nested-dropdown {
-        display: none;
-        position: absolute;
-        top: 0;
-        left: 160px;
-        min-width: 160px;
-        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-        background-color: #f1f1f1;
-      }
-
-      .dropdown-content > a:hover .nested-dropdown {
-        display: block;
-      }
-
-      .dropdown-content > a:hover .nested-dropdown {
-        display: block;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Dropdown menu structure -->
-    <div class="dropdown">
-      <button class="dropbtn">MENU</button>
-      <div id="dropdownOptions" class="dropdown-content">
-        <a href="#" id="effectif1">EFFECTIF</a>
-        <div id="nestedEffectif1" class="nested-dropdown">
-          <a href="#" id="finca1">FINCA 01</a>
-          <a href="#" id="finca2">FINCA 02</a>
-          <a href="#" id="finca3">FINCA 03</a>
-          <a href="#" id="finca4">FINCA 04</a>
-          <a href="#" id="finca5">FINCA 05</a>
-          <a href="#" id="finca6">FINCA 06</a>
-          <a href="#" id="finca9">FINCA 09</a>
-          <a href="#" id="finca13">FINCA 13</a>
-          <a href="#" id="finca19">FINCA 19</a>
-          <a href="https://aroma-rh.github.io/F20/" id="finca20">FINCA 20</a>
-          <a href="#" id="finca21">FINCA 21</a>
-          <a href="#" id="finca22">FINCA 22</a>
-        </div>
-        <a href="https://aroma-rh.github.io/EFFECTIF/">FORM</a>
-        <a href="#">SALAIRE</a>
-      </div>
-    </div>
-
-    <h3>LA BASE (CAMPO)</h3>
-
-    <table id="dataTable">
-      <thead>
-        <tr>
-          <th><input type="text" id="filter1" placeholder="Filtre..." oninput="filterTable()"></th>
-          <th><input type="text" id="filter2" placeholder="Filtre..." oninput="filterTable()"></th>
-          <th><input type="text" id="filter3" placeholder="Filtre..." oninput="filterTable()"></th>
-          <th><input type="text" id="filter4" placeholder="Filtre..." oninput="filterTable()"></th>
-          <th><input type="text" id="filter5" placeholder="Filtre..." oninput="filterTable()"></th>
-        </tr>
-        <tr>
-          <th>CODIGO</th>
-          <th>NOMBRE</th>
-          <th>NIF</th>
-          <th>CONTRATO</th>
-          <th>ENCARGADO</th>
-        </tr>
-      </thead>
-      <tbody id="tableData"></tbody>
-    </table>
-
-    <script>
-      let data = [];  
-
-      function loadData() {
-        fetch('https://script.google.com/macros/s/AKfycbyQn5_QevlEOIt31TZrCgVsiWGHoLBZUHRPs1pFgLx4Qqm0nthi51w4SJ5QhAfQhGc/exec')
-          .then(response => response.json())
-          .then(jsonData => {
-            data = jsonData;  
-            renderTable(data);  
-          })
-          .catch(error => {
-            console.error('Error loading data:', error);
-            alert('Error loading data');
-          });
-      }
-
-      function renderTable(displayData) {
-        const tableData = document.getElementById('tableData');
-        tableData.innerHTML = displayData.map(row => 
-          `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`
-        ).join('');
-      }
-
-      function filterTable() {
-        const filters = [
-          document.getElementById("filter1").value.toLowerCase(),
-          document.getElementById("filter2").value.toLowerCase(),
-          document.getElementById("filter3").value.toLowerCase(),
-          document.getElementById("filter4").value.toLowerCase(),
-          document.getElementById("filter5").value.toLowerCase()
-        ];
-
-        const filteredData = data.filter(row =>
-          filters.every((filter, i) => {
-            if (!filter) return true;  
-
-            const cellValue = row[i] ? row[i].toString().toLowerCase() : '';
-
-            return cellValue.includes(filter);
-          })
-        );
-
-        renderTable(filteredData);
-      }
-
-
-      document.getElementById('effectif1').addEventListener('click', function(event) {
-        const nestedEffectif = document.getElementById('nestedEffectif1');
-     
-        nestedEffectif.style.display = 'none';
-       
-        event.preventDefault();
-      });
-
-      
-      document.getElementById('effectif1').addEventListener('mouseover', function() {
-        const nestedEffectif = document.getElementById('nestedEffectif1');
-        nestedEffectif.style.display = 'block';
-      });
-
-      
-      document.addEventListener('DOMContentLoaded', loadData);
-    </script>
-  </body>
+    document.addEventListener('DOMContentLoaded', loadData);
+  </script>
+</body>
 </html>
