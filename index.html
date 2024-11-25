@@ -99,8 +99,9 @@
 
   <h3>LA BASE (CAMPO)</h3>
   <div style="text-align: center; margin-top: 10px;">
-    <button id="goToforme" onclick="goToforme()">Retour</button>
+    
     <button id="filterButton" onclick="filterTable()">Recherch</button>
+    <button id="filterButton" onclick="downloadTable()">Télécharger</button>
   </div>
   <table id="dataTable">
     <thead>
@@ -124,11 +125,15 @@
   </table>
 
   
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
   <script>
-    function goToforme() {
-    window.location.href = "https://aroma-rh.github.io/EFFECTIF/";
-  }
+     function downloadTable() {
+            var table = document.getElementById("dataTable");
+            var rows = table.rows;
+            var degree = rows[2].cells[4].innerText;
+            var wb = XLSX.utils.table_to_book(table, {sheet: "base"});
+            XLSX.writeFile(wb, `${degree}.xlsx`); 
+        }
     let data = [];  
     function loadData() {
       fetch('https://script.google.com/macros/s/AKfycbyQn5_QevlEOIt31TZrCgVsiWGHoLBZUHRPs1pFgLx4Qqm0nthi51w4SJ5QhAfQhGc/exec')
@@ -183,7 +188,7 @@
 
       renderTable(filteredData); 
     }
-
+    
     document.addEventListener('DOMContentLoaded', loadData);
   </script>
 </body>
