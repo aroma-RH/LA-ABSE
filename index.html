@@ -79,7 +79,7 @@
     #filterButton:hover {
       background-color: #357ab8;
     }
-    #goToforme {
+    .goToforme {
       margin-top: 10px;
       padding: 10px 20px;
       background-color: #4a90e2;
@@ -90,16 +90,17 @@
       font-size: 16px;
     }
 
-    #goToforme:hover {
+    .goToforme:hover {
       background-color: #357ab8;
     }
+
   </style>
 </head>
 <body>
 
   <h3>LA BASE (CAMPO)</h3>
   <div style="text-align: center; margin-top: 10px;">
-    
+    <button class="goToforme" id="copyLinkButton">Copier le lien</button>
     <button id="filterButton" onclick="filterTable()">Recherch</button>
     <button id="filterButton" onclick="downloadTable()">Télécharger</button>
   </div>
@@ -127,6 +128,18 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
   <script>
+    document.getElementById('copyLinkButton').addEventListener('click', function() {
+            const pageLink = window.location.href;
+
+            navigator.clipboard.writeText(pageLink)
+                .then(() => {
+                    alert("Lien de la page copié dans le presse-papiers");
+                })
+                .catch(err => {
+                    console.error("Impossible de copier le lien : ", err);
+                    alert("Échec de la copie du lien.");
+                });
+        });
      function downloadTable() {
             var table = document.getElementById("dataTable");
             var rows = table.rows;
